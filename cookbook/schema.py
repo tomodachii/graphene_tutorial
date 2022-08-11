@@ -34,6 +34,22 @@ class CreateCategoryMutation(graphene.Mutation):
         return CreateCategoryMutation(category=category)
 
 
+class DeleteCategoryMutation(graphene.Mutation):
+    ok = graphene.Boolean()
+
+    class Arguments:
+        id = graphene.ID()
+
+    @classmethod
+    def mutate(cls, root, info, **kwargs):
+        try:
+            category = Category.objects.get(pk=kwargs["id"])
+            category.delete()
+        except Category.DoesNotExist:
+            return cls(ok=False)
+        return cls(ok=True)
+
+
 class UpdateCategoryMutation(graphene.Mutation):
     class Arguments:
         # The input arguments for this mutation
@@ -122,6 +138,7 @@ class Query(graphene.ObjectType):
 class Mutation(graphene.ObjectType):
     update_category = UpdateCategoryMutation.Field()
     create_category = CreateCategoryMutation.Field()
+    delete_category = DeleteCategoryMutation.Field()
     create_ingredient = CreateIngredientMutation.Field()
     update_ingredient = UpdateIngredientMutation.Field()
 
